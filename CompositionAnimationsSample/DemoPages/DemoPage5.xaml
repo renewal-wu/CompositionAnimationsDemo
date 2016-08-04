@@ -5,12 +5,36 @@
     xmlns:local="using:CompositionAnimationsSample.DemoPages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:DemoItems="using:CompositionAnimationsSample.DemoItems"
     mc:Ignorable="d">
+
+    <Page.Resources>
+        <DemoItems:DemoColorItems x:Key="DemoItems"/>
+    </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ScrollViewer x:Name="TargetScrollViewer">
             <StackPanel Height="5000">
             </StackPanel>
         </ScrollViewer>
+
+        <Grid x:Name="ParallaxScrollingContainer" Visibility="Collapsed">
+            <Grid x:Name="DemoImageContainer"/>
+            <ListView x:Name="ParallaxScrollingDemoListView" DataContext="{StaticResource DemoItems}" ItemsSource="{Binding Items}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Background="{Binding Background}" Height="300">
+                            <TextBlock Text="{Binding Content}" Foreground="{Binding Foreground}" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="VerticalAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </Grid>
     </Grid>
 </Page>

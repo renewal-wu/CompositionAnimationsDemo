@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SamplesCommon;
+using System;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Windows.UI.Composition;
@@ -10,7 +12,6 @@ namespace CompositionAnimationsSample.DemoPages
     public sealed partial class DemoPage5 : Page
     {
         private Compositor compositor;
-        private CompositionPropertySet scrollProperties;
 
         public DemoPage5()
         {
@@ -19,9 +20,9 @@ namespace CompositionAnimationsSample.DemoPages
             SurfaceLoader.Initialize(ElementCompositionPreview.GetElementVisual(this).Compositor);
 
             compositor = ElementCompositionPreview.GetElementVisual(this).Compositor;
-            scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(TargetScrollViewer);
 
             StartExpressionAnimation();
+            //ParallaxScrollingDemoListView.Loaded += ParallaxScrollingDemoListView_Loaded;
         }
 
         private async void StartExpressionAnimation()
@@ -38,6 +39,9 @@ namespace CompositionAnimationsSample.DemoPages
             // 將圖片讀進 spriteVisual
             spriteVisual.Brush = targetBrush;
             spriteVisual.Size = new Vector2(300f, 300f);
+
+            // 取得 ScrollViewer PropertySet
+            CompositionPropertySet scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(TargetScrollViewer);
 
             // Expression animation 規則
             // 捲軸向下垂直捲動的距離 > TopBreak 時，物件垂直位移為 [0]
@@ -58,6 +62,50 @@ namespace CompositionAnimationsSample.DemoPages
         {
             var surface = await SurfaceLoader.LoadFromUri(new Uri("ms-appx:///Assets/KKBOX.png"));
             return compositor.CreateSurfaceBrush(surface);
+        }
+
+        private void ParallaxScrollingDemoListView_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            StartParallaxScrollingAnimation();
+        }
+
+        /// <summary>
+        /// 視差捲動動畫
+        /// </summary>
+        private async void StartParallaxScrollingAnimation()
+        {
+            TargetScrollViewer.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            ParallaxScrollingContainer.Visibility = Windows.UI.Xaml.Visibility.Visible;
+
+            // 將 containerVisual 與 spriteVisual 新增至 DemoImageContainer 中
+            var containerVisual = compositor.CreateContainerVisual();
+            var spriteVisual = compositor.CreateSpriteVisual();
+            containerVisual.Children.InsertAtTop(spriteVisual);
+            ElementCompositionPreview.SetElementChildVisual(DemoImageContainer, containerVisual);
+
+            // 讀圖
+            var targetBrush = await GenerateCompositionBrush();
+
+            // 將圖片讀進 spriteVisual
+            spriteVisual.Brush = targetBrush;
+            spriteVisual.Size = new Vector2(300f, 300f);
+
+            // 取得 ListView 內的 ScrollViewer
+            ParallaxScrollingDemoListView.UpdateLayout();
+            var scrollViewer = ParallaxScrollingDemoListView.GetDescendantsOfType<ScrollViewer>().FirstOrDefault();
+            if (scrollViewer == null)
+            {
+                return;
+            }
+
+            // 取得 ScrollViewer PropertySet
+            CompositionPropertySet scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(TargetScrollViewer);
+
+            // 視差捲動
+            var expressionAnimation = compositor.CreateExpressionAnimation();
+            expressionAnimation.SetReferenceParameter("ScrollManipulation", scrollProperties);
+            expressionAnimation.Expression = "-ScrollManipulation.Translation.Y * 0.2";
+            spriteVisual.StartAnimation("Offset.Y", expressionAnimation);
         }
     }
 }
