@@ -43,6 +43,12 @@ namespace CompositionAnimationsSample.DemoPages
             spriteVisual.Brush = targetBrush;
             spriteVisual.Size = new Vector2(300f, 300f);
 
+            // 建立互動來源 (必須指定互動範圍區域)
+            interactionSource = VisualInteractionSource.Create(rootVisual);
+
+            // 設定互動方式
+            interactionSource.PositionYSourceMode = InteractionSourceMode.EnabledWithInertia;
+
             // 建立 InteractionTracker
             tracker = InteractionTracker.Create(compositor);
 
@@ -50,12 +56,6 @@ namespace CompositionAnimationsSample.DemoPages
             // 類似 ScrollViewer.ScrollableHeight, ScrollViewer.ScrollableWidth
             tracker.MaxPosition = new Vector3(0, 300f, 0);
             tracker.MinPosition = new Vector3();
-
-            // 建立互動來源 (必須指定互動範圍區域)
-            interactionSource = VisualInteractionSource.Create(rootVisual);
-
-            // 設定互動方式
-            interactionSource.PositionYSourceMode = InteractionSourceMode.EnabledWithInertia;
 
             // 將互動來源加至 tracker
             tracker.InteractionSources.Add(interactionSource);

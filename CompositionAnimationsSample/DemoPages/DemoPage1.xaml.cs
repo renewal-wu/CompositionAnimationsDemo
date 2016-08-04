@@ -25,8 +25,8 @@ namespace CompositionAnimationsSample.DemoPages
             //
             ////////////////////////////////////////////////////////////////////////////////////////////////
 
-            // 試著取得 [沒有被加至 Visual Tree 的元件] 的 Visual 與 Compositor
-            // 會有問題嗎???
+            //// 試著取得 [沒有被加至 Visual Tree 的元件] 的 Visual 與 Compositor
+            //// 會有問題嗎???
             //var textBlock = new TextBlock();
             //var textBlockVisual = ElementCompositionPreview.GetElementVisual(textBlock);
             //var textBlockCompositor = textBlockVisual.Compositor;
